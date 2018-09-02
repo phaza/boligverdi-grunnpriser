@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="no">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Snittverdi bolig grunnkretser Asker og Bærum 2018 - budstikka.no</title>
+  <link rel="stylesheet" href="//unpkg.com/leaflet@1.3.4/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+    crossorigin="">
+  <script src="//unpkg.com/leaflet@1.3.4/dist/leaflet.js" integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
+    crossorigin=""></script>
+  <script src="base.js"></script>
+  <script src="L.Projection.UTM33.js"></script>
+  <script src="http://192.168.1.241:1337/vorlon.js"></script>
+  <style>
+    html,
+    body,
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+
+    .info {
+      padding: 6px 8px;
+      font: 14px/16px Arial, Helvetica, sans-serif;
+      background: white;
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      border-radius: 5px;
+    }
+
+    .info h4 {
+      margin: 0 0 5px;
+      color: #777;
+    }
+
+    .legend {
+      text-align: left;
+      line-height: 18px;
+      color: #555;
+    }
+
+    .legend i {
+      width: 18px;
+      height: 18px;
+      float: left;
+      margin-right: 8px;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+  <script>
+    var osmUrl = '//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    var osmAttrib = 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
+    var osm = new L.TileLayer(osmUrl, { minZoom: 4, maxZoom: 15, attribution: osmAttrib });
+    var map = L.map('map')
+      .setView([59.84498732529618, 10.613136291503908], 11)
+      .addLayer(osm);
+
+    var myStyle = {
+      "color": "#f00",
+      "weight": 1,
+      "fillOpacity": 0.54
+    };
+
+    var geo = null;
+
+    function between(one, two, check) {
+      return check >= one && check < two;
+    }
+
+    function getColor(price) {
+      if (between(1000000, 2000000, price)) return '#64E500';
+      if (between(2000000, 3000000, price)) return '#94E200';
+      if (between(3000000, 4000000, price)) return '#C2DF00';
+      if (between(4000000, 5000000, price)) return '#DCCA00';
+      if (between(5000000, 6000000, price)) return '#DA9800';
+      if (between(6000000, 7000000, price)) return '#D76800';
+      if (between(7000000, 8000000, price)) return '#D43900';
+      if (between(8000000, 9000000, price)) return '#D20B00';
+      if (between(9000000, 10000000, price)) return '#CF0020';
+      if (between(10000000, 11000000, price)) return '#CC004C';
+      if (between(11000000, 12000000, price)) return '#C90076';
+      if (between(12000000, 13000000, price)) return '#C7009F';
+      if (between(13000000, 14000000, price)) return '#C100C4';
+      if (between(14000000, 15000000, price)) return '#9500C1';
+      if (between(15000000, 16000000, price)) return '#6900BF';
+    }
+
+    var legend = L.control({ position: 'bottomright' });
+
+    legend.onAdd = function (map) {
+
+      var div = L.DomUtil.create('div', 'info legend');
+      var m = 1000000;
+
+      // loop through our density intervals and generate a label with a colored square for each interval
+      for (var i = m; i < 16000000; i += m) {
+        div.innerHTML +=
+          '<i style="background:' + getColor(i) + '"></i> ' +
+          i / m + 'M' + ((i + m) ? ' &ndash; ' + ((i + m) / m) + 'M<br>' : '+');
+      }
+
+      return div;
+    };
+
+    legend.addTo(map);
+
+    getUrl('./priser.json', function (data) {
+      var grunnkretser = JSON.parse(data.responseText);
+
+      function getStyle(feature) {
+        var gno = feature.properties.grunnkretsnummer;
+        var price = parseInt(grunnkretser[gno], 10);
+        var style = Object.assign({}, myStyle);
+        style.fillColor = getColor(price);
+        console.log(gno, price, style);
+        return style;
+      }
+
+      loadData('./ab.geojson', function (layer) {
+        geo = layer;
+      }, getStyle);
+
+    })
+
+    map.on('zoomend', function (e) {
+      if (map.getZoom() >= 13) {
+        geo.addTo(map);
+      }
+      else {
+        map.removeLayer(geo);
+      }
+    });
+
+
+  </script>
+</body>
+
+</html>
