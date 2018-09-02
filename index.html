@@ -94,35 +94,7 @@
       .setView([59.84498732529618, 10.613136291503908], 11)
       .addLayer(osm);
 
-    var myStyle = {
-      "color": "#f00",
-      "weight": 1,
-      "fillOpacity": 0.34
-    };
-
     var geo = null;
-
-    function between(one, two, check) {
-      return check >= one && check < two;
-    }
-
-    function getColor(price) {
-      if (between(1000000, 2000000, price)) return '#64E500';
-      if (between(2000000, 3000000, price)) return '#94E200';
-      if (between(3000000, 4000000, price)) return '#C2DF00';
-      if (between(4000000, 5000000, price)) return '#DCCA00';
-      if (between(5000000, 6000000, price)) return '#DA9800';
-      if (between(6000000, 7000000, price)) return '#D76800';
-      if (between(7000000, 8000000, price)) return '#D43900';
-      if (between(8000000, 9000000, price)) return '#D20B00';
-      if (between(9000000, 10000000, price)) return '#CF0020';
-      if (between(10000000, 11000000, price)) return '#CC004C';
-      if (between(11000000, 12000000, price)) return '#C90076';
-      if (between(12000000, 13000000, price)) return '#C7009F';
-      if (between(13000000, 14000000, price)) return '#C100C4';
-      if (between(14000000, 15000000, price)) return '#9500C1';
-      if (between(15000000, 16000000, price)) return '#6900BF';
-    }
 
     var labels = L.layerGroup();
 
@@ -195,20 +167,28 @@
 
     legend.addTo(map);
 
-    getUrl('./priser.json', function (data) {
-      var grunnkretser = JSON.parse(data.responseText);
+    function onMouseOver(e) {
+      var l = e.target;
 
-      function getStyle(feature) {
-        var gno = feature.properties.grunnkretsnummer;
-        var price = parseInt(grunnkretser[gno], 10);
-        var style = Object.assign({}, myStyle);
-        style.fillColor = getColor(price);
-        return style;
-      }
+      l.setStyle({
+        weight: 3
+      });
+    }
+
+    function onMouseOut(e) {
+      var l = e.target;
+
+      l.setStyle({
+        weight: 1
+      });
+    }
+
+    getUrl('./priser.json', function (data) {
+      var prices = JSON.parse(data.responseText);
 
       loadData('./ab.geojson', function (layer) {
         geo = layer;
-      }, getStyle);
+      }, prices, onMouseOver, onMouseOut);
 
     })
 
