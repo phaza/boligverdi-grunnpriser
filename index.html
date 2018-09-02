@@ -40,6 +40,18 @@
       color: #555;
     }
 
+    .legend ol {
+        -moz-column-count: 2;
+        -moz-column-gap: 20px;
+        -webkit-column-count: 2;
+        -webkit-column-gap: 20px;
+        column-count: 2;
+        column-gap: 20px;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
     .legend i {
       width: 18px;
       height: 18px;
@@ -148,12 +160,20 @@
       var div = L.DomUtil.create('div', 'info legend');
       var m = 1000000;
 
+      var tmp = '<ol>';
       // loop through our density intervals and generate a label with a colored square for each interval
       for (var i = m; i < 16000000; i += m) {
-        div.innerHTML +=
-          '<i style="background:' + getColor(i) + '"></i> ' +
-          i / m + 'M' + ((i + m) ? ' &ndash; ' + ((i + m) / m) + 'M<br>' : '+');
+        tmp +=
+          '<li><i style="background-color:' + getColor(i) + '"></i> ' +
+          i / m + 'M' + ((i + m) ? ' &ndash; ' + ((i + m) / m) + 'M' : '+');
+        tmp += '</li>';
+        if(i === 8000000) {
+          tmp += '<li>&nbsp;</li>';
+        }
       }
+      tmp += '</ol>';
+
+      div.innerHTML = tmp;
 
       return div;
     };
