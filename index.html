@@ -12,7 +12,6 @@
     crossorigin=""></script>
   <script src="base.js"></script>
   <script src="L.Projection.UTM33.js"></script>
-  <script src="http://192.168.1.241:1337/vorlon.js"></script>
   <style>
     html,
     body,
@@ -48,6 +47,14 @@
       margin-right: 8px;
       opacity: 0.7;
     }
+    .b-tooltip {
+      background-color: rgba(0, 0, 0, 0.575);
+      border: none;
+      box-shadow: none;
+      text-transform: uppercase;
+      color: #eee;
+      font-size: 1em;
+    }
   </style>
 </head>
 
@@ -64,7 +71,7 @@
     var myStyle = {
       "color": "#f00",
       "weight": 1,
-      "fillOpacity": 0.54
+      "fillOpacity": 0.34
     };
 
     var geo = null;
@@ -90,6 +97,49 @@
       if (between(14000000, 15000000, price)) return '#9500C1';
       if (between(15000000, 16000000, price)) return '#6900BF';
     }
+
+    var labels = L.layerGroup();
+
+    getUrl('./delomrader.json', function(data) {
+      var d = JSON.parse(data.responseText);
+      var nav = L.control({position: 'topright'});
+      nav.onAdd = function(map) {
+        var select = L.DomUtil.create('select');
+        select.innerHTML += "<option>Velg område å se på</option>";
+        Object.keys(d).forEach(function(muni) {
+          select.innerHTML += '<optgroup label="' + muni + '">';
+            Object.keys(d[muni]).forEach(function(area) {
+              select.innerHTML += '<option data-lat="'+ d[muni][area].lat +'" data-lng="'+ d[muni][area].lng +'">' + area + '</option>';
+              L.circleMarker([d[muni][area].lat, d[muni][area].lng], {
+                radius: 1,
+                opacity: 0,
+              })
+                .bindTooltip(area, {
+                  permanent: true,
+                  direction: 'center',
+                  opacity: 1,
+                  className: 'b-tooltip'
+                })
+                .addTo(labels);
+            });
+          select.innerHTML += '</optgroup>';
+        });
+
+        select.addEventListener('change', function() {
+          var lat = parseFloat(this.options[this.selectedIndex].getAttribute('data-lat'));
+          var lng = parseFloat(this.options[this.selectedIndex].getAttribute('data-lng'));
+
+          if(!isNaN(lat) && !isNaN(lng)) {
+            map.flyTo([lat, lng], 13);
+          }
+
+        });
+
+        return select;
+      };
+
+      nav.addTo(map);
+    });
 
     var legend = L.control({ position: 'bottomright' });
 
@@ -118,7 +168,6 @@
         var price = parseInt(grunnkretser[gno], 10);
         var style = Object.assign({}, myStyle);
         style.fillColor = getColor(price);
-        console.log(gno, price, style);
         return style;
       }
 
@@ -131,9 +180,11 @@
     map.on('zoomend', function (e) {
       if (map.getZoom() >= 13) {
         geo.addTo(map);
+        labels.addTo(map);
       }
       else {
         map.removeLayer(geo);
+        map.removeLayer(labels);
       }
     });
 
