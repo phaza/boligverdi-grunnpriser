@@ -41,15 +41,16 @@
     }
 
     .legend ol {
-        -moz-column-count: 2;
-        -moz-column-gap: 20px;
-        -webkit-column-count: 2;
-        -webkit-column-gap: 20px;
-        column-count: 2;
+        -moz-column-count: 3;
+        -moz-column-gap: 10px;
+        -webkit-column-count: 3;
+        -webkit-column-gap: 10px;
+        column-count: 3;
         column-gap: 20px;
         list-style: none;
         padding: 0;
         margin: 0;
+        font-size: .8em;
     }
 
     .legend i {
@@ -58,6 +59,19 @@
       float: left;
       margin-right: 8px;
       opacity: 0.7;
+    }
+
+    .info.desc {
+      max-width: 40%;
+    }
+
+    .info.desc select {
+      max-width: 100%;
+    }
+
+    .info.desc p {
+      font-size: .8em;
+      color: #333;
     }
     .b-tooltip {
       background-color: rgba(0, 0, 0, 0.575);
@@ -116,8 +130,10 @@
       var d = JSON.parse(data.responseText);
       var nav = L.control({position: 'topright'});
       nav.onAdd = function(map) {
+        var div = L.DomUtil.create('div', 'info desc');
+        div.innerHTML = '<p>Prisene vil vises når du zoomer nærmere av ytelseshensyn.</p>'
         var select = L.DomUtil.create('select');
-        select.innerHTML += "<option>Velg område å se på</option>";
+        select.innerHTML += "<option>Velg område</option>";
         Object.keys(d).forEach(function(muni) {
           select.innerHTML += '<optgroup label="' + muni + '">';
             Object.keys(d[muni]).forEach(function(area) {
@@ -147,7 +163,9 @@
 
         });
 
-        return select;
+        div.appendChild(select);
+
+        return div;
       };
 
       nav.addTo(map);
@@ -165,11 +183,8 @@
       for (var i = m; i < 16000000; i += m) {
         tmp +=
           '<li><i style="background-color:' + getColor(i) + '"></i> ' +
-          i / m + 'M' + ((i + m) ? ' &ndash; ' + ((i + m) / m) + 'M' : '+');
+          i / m + 'M' + ((i + m) ? '&ndash;' + ((i + m) / m) + 'M' : '+');
         tmp += '</li>';
-        if(i === 8000000) {
-          tmp += '<li>&nbsp;</li>';
-        }
       }
       tmp += '</ol>';
 
