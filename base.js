@@ -44,7 +44,7 @@ function between(one, two, check) {
 }
 
 function getColor(price) {
-  if (between(1, 2500000, price)) return '#bf0c2b';
+  if (between(0, 2500000, price)) return '#bf0c2b';
   if (between(2500000, 5000000, price)) return '#f14c13';
   if (between(5000000, 7500000, price)) return '#f5900e';
   if (between(7500000, 10000000, price)) return '#09a38c';
