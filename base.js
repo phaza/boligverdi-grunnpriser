@@ -89,6 +89,17 @@ function loadData(url, callback, prices, onMouseOver, onMouseOut) {
           mouseover: onMouseOver(price),
           mouseout: onMouseOut
         });
+
+        var onClick = function(e) {
+          onMouseOver(price)(e);
+
+          layer.once('click', function(e) {
+            onMouseOut(e);
+            layer.once('click', onClick);
+          })
+        }
+
+        layer.once('click', onClick);
       }
     }));
 

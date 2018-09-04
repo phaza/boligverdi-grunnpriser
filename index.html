@@ -73,6 +73,10 @@
       font-size: .8em;
       color: #333;
     }
+    .info.desc .price {
+      font-size: 1.5em;
+      font-weight: bold;
+    }
     .b-tooltip {
       background-color: rgba(0, 0, 0, 0.575);
       border: none;
@@ -98,19 +102,14 @@
 
     var labels = L.layerGroup();
 
-    var infoDiv = L.DomUtil.create('div', 'info legend');
-    infoDiv.innerHTML = '<p>Velg område</p>';
-    var infoControl = L.control({position: 'topright'});
-    infoControl.onAdd = function(map) {
-      return infoDiv;
-    }
+    var priceP = null;
 
     getUrl('./delomrader.json', function(data) {
       var d = JSON.parse(data.responseText);
       var nav = L.control({position: 'topright'});
       nav.onAdd = function(map) {
         var div = L.DomUtil.create('div', 'info desc');
-        div.innerHTML = '<p>Prisene vil vises når du zoomer nærmere av ytelseshensyn.</p>'
+        div.innerHTML = '<p>Prisene vil vises når du zoomer nærmere av ytelseshensyn.</p><p class="price">&nbsp;</p>'
         var select = L.DomUtil.create('select');
         select.innerHTML += "<option>Velg område</option>";
         Object.keys(d).forEach(function(muni) {
@@ -131,6 +130,8 @@
             });
           select.innerHTML += '</optgroup>';
         });
+
+        priceP = div.querySelector('.price');
         
         select.addEventListener('change', function() {
           var lat = parseFloat(this.options[this.selectedIndex].getAttribute('data-lat'));
@@ -148,7 +149,6 @@
       };
       
       nav.addTo(map);
-      infoControl.addTo(map);
     });
 
     var legend = L.control({ position: 'bottomright' });
@@ -163,7 +163,7 @@
       for (var i = 0; i < 15000000; i += m) {
         tmp +=
           '<li><i style="background-color:' + getColor(i) + '"></i> ' +
-          i / 1000000 + 'M' + ((i + m) ? '&ndash;' + ((i + m) / 1000000) + 'M' : '+');
+          i / 1000000 + 'M &ndash;' + ((i + m) / 1000000) + 'M' + ((i + m >= 15000000) ? '+' : '');
         tmp += '</li>';
       }
       tmp += '</ol>';
@@ -181,12 +181,11 @@
         var l = e.target;
 
         if(typeof(price) !== 'undefined') {
-          infoDiv.innerHTML = '<p><b>' + price + '</b></p>';
+          priceP.innerHTML = '<p><b>' + price + '</b></p>';
         }
         else {
-          infoDiv.innerHTML = '<p>Pris ikke oppgitt</p>';
+          priceP.innerHTML = '<p>Pris ikke oppgitt</p>';
         }
-        return infoDiv;
 
         l.setStyle({
           weight: 1
