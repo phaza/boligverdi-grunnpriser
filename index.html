@@ -41,11 +41,11 @@
     }
 
     .legend ol {
-        -moz-column-count: 3;
+        -moz-column-count: 2;
         -moz-column-gap: 10px;
-        -webkit-column-count: 3;
+        -webkit-column-count: 2;
         -webkit-column-gap: 10px;
-        column-count: 3;
+        column-count: 2;
         column-gap: 20px;
         list-style: none;
         padding: 0;
@@ -98,6 +98,13 @@
 
     var labels = L.layerGroup();
 
+    var infoDiv = L.DomUtil.create('div', 'info legend');
+    infoDiv.innerHTML = '<p>Velg område</p>';
+    var infoControl = L.control({position: 'topright'});
+    infoControl.onAdd = function(map) {
+      return infoDiv;
+    }
+
     getUrl('./delomrader.json', function(data) {
       var d = JSON.parse(data.responseText);
       var nav = L.control({position: 'topright'});
@@ -124,23 +131,24 @@
             });
           select.innerHTML += '</optgroup>';
         });
-
+        
         select.addEventListener('change', function() {
           var lat = parseFloat(this.options[this.selectedIndex].getAttribute('data-lat'));
           var lng = parseFloat(this.options[this.selectedIndex].getAttribute('data-lng'));
-
+          
           if(!isNaN(lat) && !isNaN(lng)) {
             map.flyTo([lat, lng], 13);
           }
-
+          
         });
-
+        
         div.appendChild(select);
-
+        
         return div;
       };
-
+      
       nav.addTo(map);
+      infoControl.addTo(map);
     });
 
     var legend = L.control({ position: 'bottomright' });
@@ -148,14 +156,14 @@
     legend.onAdd = function (map) {
 
       var div = L.DomUtil.create('div', 'info legend');
-      var m = 1000000;
+      var m = 2500000;
 
       var tmp = '<ol>';
       // loop through our density intervals and generate a label with a colored square for each interval
-      for (var i = m; i < 16000000; i += m) {
+      for (var i = 0; i < 15000000; i += m) {
         tmp +=
           '<li><i style="background-color:' + getColor(i) + '"></i> ' +
-          i / m + 'M' + ((i + m) ? '&ndash;' + ((i + m) / m) + 'M' : '+');
+          i / 1000000 + 'M' + ((i + m) ? '&ndash;' + ((i + m) / 1000000) + 'M' : '+');
         tmp += '</li>';
       }
       tmp += '</ol>';
@@ -167,19 +175,30 @@
 
     legend.addTo(map);
 
-    function onMouseOver(e) {
-      var l = e.target;
 
-      l.setStyle({
-        weight: 3
-      });
+    function onMouseOver(price) {
+      return function(e) {
+        var l = e.target;
+
+        if(typeof(price) !== 'undefined') {
+          infoDiv.innerHTML = '<p><b>' + price + '</b></p>';
+        }
+        else {
+          infoDiv.innerHTML = '<p>Pris ikke oppgitt</p>';
+        }
+        return infoDiv;
+
+        l.setStyle({
+          weight: 1
+        });
+      }
     }
 
     function onMouseOut(e) {
       var l = e.target;
-
+      
       l.setStyle({
-        weight: 1
+        weight: 0
       });
     }
 

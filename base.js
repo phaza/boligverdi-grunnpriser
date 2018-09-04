@@ -44,27 +44,18 @@ function between(one, two, check) {
 }
 
 function getColor(price) {
-  if (between(1000000, 2000000, price)) return '#64E500';
-  if (between(2000000, 3000000, price)) return '#94E200';
-  if (between(3000000, 4000000, price)) return '#C2DF00';
-  if (between(4000000, 5000000, price)) return '#DCCA00';
-  if (between(5000000, 6000000, price)) return '#DA9800';
-  if (between(6000000, 7000000, price)) return '#D76800';
-  if (between(7000000, 8000000, price)) return '#D43900';
-  if (between(8000000, 9000000, price)) return '#D20B00';
-  if (between(9000000, 10000000, price)) return '#CF0020';
-  if (between(10000000, 11000000, price)) return '#CC004C';
-  if (between(11000000, 12000000, price)) return '#C90076';
-  if (between(12000000, 13000000, price)) return '#C7009F';
-  if (between(13000000, 14000000, price)) return '#C100C4';
-  if (between(14000000, 15000000, price)) return '#9500C1';
-  if (between(15000000, 16000000, price)) return '#6900BF';
+  if (between(1, 2500000, price)) return '#bf0c2b';
+  if (between(2500000, 5000000, price)) return '#f14c13';
+  if (between(5000000, 7500000, price)) return '#f5900e';
+  if (between(7500000, 10000000, price)) return '#09a38c';
+  if (between(1000000, 12500000, price)) return '#29ADFF';
+  if (between(12500000, 18000000, price)) return '#02173e';
 }
 
 var myStyle = {
-  "color": "#f00",
-  "weight": 1,
-  "fillOpacity": 0.34
+  "color": "#888",
+  "weight": 0,
+  "fillOpacity": 0.44
 };
 
 function loadData(url, callback, prices, onMouseOver, onMouseOut) {
@@ -78,7 +69,9 @@ function loadData(url, callback, prices, onMouseOver, onMouseOut) {
           var gno = feature.properties.grunnkretsnummer;
           var price = parseInt(prices[gno], 10);
           var style = Object.assign({}, myStyle);
-          style.fillColor = getColor(price);
+          if(typeof(price) !== 'undefined') {
+            style.fillColor = getColor(price);
+          }
           return style;
       },
       coordsToLatLng: function(coords) {
@@ -93,15 +86,9 @@ function loadData(url, callback, prices, onMouseOver, onMouseOut) {
         });
 
         layer.on({
-          mouseover: onMouseOver,
+          mouseover: onMouseOver(price),
           mouseout: onMouseOut
         });
-
-
-        if(typeof(price) !== 'undefined') {
-          layer.bindTooltip(price); 
-        } 
-
       }
     }));
 
