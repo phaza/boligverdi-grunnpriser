@@ -53,8 +53,8 @@ function getColor(price) {
 }
 
 var myStyle = {
-  "color": "#888",
-  "weight": 0,
+  "color": "#fff",
+  "weight":1,
   "fillOpacity": 0.44
 };
 
@@ -83,6 +83,18 @@ function loadData(url, callback, prices, onMouseOver, onMouseOut) {
         var price = prices[no];
         var coords = feature.geometry.coordinates.map(function(v, i) {
           return L.Projection.UTM33.unproject({x: v[i][0], y: v[i][1]});
+        });
+
+        if(typeof(price) === 'undefined') {
+          price = "Ikke oppgitt";
+        }
+        else 
+        {
+          price = '<b>' + price + '</b>';
+        }
+        layer.bindTooltip('<p>' + price + '</p>', {
+          direction: 'center',
+          // sticky: true
         });
 
         layer.on({

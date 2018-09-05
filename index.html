@@ -8,8 +8,9 @@
   <title>Snittverdi bolig grunnkretser Asker og Bærum 2018 - budstikka.no</title>
   <link rel="stylesheet" href="//unpkg.com/leaflet@1.3.4/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
     crossorigin="">
-  <script src="//unpkg.com/leaflet@1.3.4/dist/leaflet.js" integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
-    crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet-src.js"></script>
+  <!-- <script src="//unpkg.com/leaflet@1.3.4/dist/leaflet.js" integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
+    crossorigin=""></script> -->
   <script src="base.js"></script>
   <script src="L.Projection.UTM33.js"></script>
   <style>
@@ -109,7 +110,11 @@
       var nav = L.control({position: 'topright'});
       nav.onAdd = function(map) {
         var div = L.DomUtil.create('div', 'info desc');
-        div.innerHTML = '<p>Prisene vil vises når du zoomer nærmere av ytelseshensyn.</p><p class="price">&nbsp;</p>'
+        div.innerHTML = '<p>Prisene vil vises når du zoomer nærmere av ytelseshensyn.</p>'
+        if(L.Browser.mobile) {
+          div.innerHTML += '<p class="price">&nbsp;</p>';
+          priceP = div.querySelector('.price');
+        }
         var select = L.DomUtil.create('select');
         select.innerHTML += "<option>Velg område</option>";
         Object.keys(d).forEach(function(muni) {
@@ -130,8 +135,6 @@
             });
           select.innerHTML += '</optgroup>';
         });
-
-        priceP = div.querySelector('.price');
         
         select.addEventListener('change', function() {
           var lat = parseFloat(this.options[this.selectedIndex].getAttribute('data-lat'));
@@ -175,29 +178,25 @@
 
     legend.addTo(map);
 
-
     function onMouseOver(price) {
       return function(e) {
         var l = e.target;
 
-        if(typeof(price) !== 'undefined') {
-          priceP.innerHTML = '<p><b>' + price + '</b></p>';
-        }
-        else {
-          priceP.innerHTML = '<p>Pris ikke oppgitt</p>';
+        if(L.Browser.mobile && priceP !== null) {
+          priceP.innerHTML = '<p>' + price + '</p>';
         }
 
         l.setStyle({
-          weight: 1
+          weight: 2
         });
       }
     }
 
     function onMouseOut(e) {
       var l = e.target;
-      
+  
       l.setStyle({
-        weight: 0
+        weight: 1
       });
     }
 
