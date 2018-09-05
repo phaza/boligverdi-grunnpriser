@@ -58,6 +58,11 @@ var myStyle = {
   "fillOpacity": 0.44
 };
 
+var priceFormatter =  new Intl.NumberFormat('nb-NO', { style: 'decimal' });
+function formatPrice(price) {
+  return 'kr ' + priceFormatter.format(price).replace(' ', '.');
+}
+
 function loadData(url, callback, prices, onMouseOver, onMouseOut) {
   getUrl(url, function(data) {
     var json = JSON.parse(data.responseText);
@@ -90,7 +95,7 @@ function loadData(url, callback, prices, onMouseOver, onMouseOut) {
         }
         else 
         {
-          price = '<b>' + price + '</b>';
+          price = '<b>' + formatPrice(price) + '</b>';
         }
         layer.bindTooltip('<p>' + price + '</p>', {
           direction: 'center',
