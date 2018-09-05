@@ -60,7 +60,7 @@ var myStyle = {
 
 var priceFormatter =  new Intl.NumberFormat('nb-NO', { style: 'decimal' });
 function formatPrice(price) {
-  return 'kr ' + priceFormatter.format(price).replace(/\s+/, '.');
+  return 'kr ' + priceFormatter.format(price).replace(/\s+/g, '.');
 }
 
 function loadData(url, callback, prices, onMouseOver, onMouseOut) {
