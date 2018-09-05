@@ -97,26 +97,25 @@ function loadData(url, callback, prices, onMouseOver, onMouseOut) {
         {
           price = '<b>' + formatPrice(price) + '</b>';
         }
-        layer.bindTooltip('<p>' + price + '</p>', {
-          direction: 'center',
-          // sticky: true
-        });
-
-        layer.on({
-          mouseover: onMouseOver(price),
-          mouseout: onMouseOut
-        });
-
-        var onClick = function(e) {
-          onMouseOver(price)(e);
-
-          layer.once('click', function(e) {
-            onMouseOut(e);
-            layer.once('click', onClick);
-          })
+        if(!L.Browser.mobile) {
+          layer.bindTooltip('<p>' + price + '</p>', {
+            direction: 'center',
+            // sticky: true
+          });
+        }
+        else {
+          var onClick = function(e) {
+            onMouseOver(price)(e);
+  
+            layer.once('click', function(e) {
+              onMouseOut(e);
+              layer.once('click', onClick);
+            })
+          }
+  
+          layer.once('click', onClick);
         }
 
-        layer.once('click', onClick);
       }
     }));
 
