@@ -49,7 +49,8 @@ function getColor(price) {
   if (between(5000000, 7500000, price)) return '#f5900e';
   if (between(7500000, 10000000, price)) return '#09a38c';
   if (between(1000000, 12500000, price)) return '#29ADFF';
-  if (between(12500000, 20000000, price)) return '#02173e';
+  if (between(12500000, 15000000, price)) return '#02173e';
+  if (between(15000000, 20000000, price)) return '#8E0CE8';
 }
 
 var myStyle = {
