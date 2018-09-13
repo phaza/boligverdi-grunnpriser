@@ -94,7 +94,7 @@
   <script>
     var osmUrl = '//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
     var osmAttrib = 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
-    var osm = new L.TileLayer(osmUrl, { minZoom: 4, maxZoom: 15, attribution: osmAttrib });
+    var osm = new L.TileLayer(osmUrl, { minZoom: 4, maxZoom: 16, attribution: osmAttrib });
     var map = L.map('map')
       .setView([59.84498732529618, 10.613136291503908], 11)
       .addLayer(osm);
